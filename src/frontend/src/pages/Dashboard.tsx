@@ -82,6 +82,12 @@ export default function Dashboard() {
   const toggle = (card: string) =>
     setExpandedCard((prev) => (prev === card ? null : card));
 
+  const subjects = [
+    { key: "physics" as const, label: "Physics" },
+    { key: "chemistry" as const, label: "Chem" },
+    { key: "maths" as const, label: "Maths" },
+  ];
+
   return (
     <div className="px-4 pt-6 pb-28">
       {/* Greeting */}
@@ -282,21 +288,39 @@ export default function Dashboard() {
         )}
       </GlassCard>
 
-      {/* Goal progress bar */}
-      {totalCompleted < exam.dailyGoal && (
-        <div className="mt-3 px-1">
-          <div className="flex justify-between text-[11px] text-[#666666] mb-1">
-            <span>Daily goal: {exam.dailyGoal} PYQs</span>
-            <span>{exam.dailyGoal - totalCompleted} remaining</span>
-          </div>
-          <div className="h-1.5 bg-white/40 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#222222] rounded-full transition-all duration-500"
-              style={{ width: `${Math.min(100, progress)}%` }}
-            />
-          </div>
+      {/* Subject breakdown */}
+      <div className="mt-3 px-1" data-ocid="dashboard.subjects.section">
+        <p className="text-[10px] font-semibold text-[#666666] uppercase tracking-wider mb-2">
+          Subjects Today
+        </p>
+        <div className="flex flex-col gap-2">
+          {subjects.map(({ key, label }) => {
+            const completed = todayPYQ[key].completed;
+            const target = todayPYQ[key].target;
+            const pct =
+              target > 0
+                ? Math.min(100, Math.round((completed / target) * 100))
+                : 0;
+            return (
+              <div key={key}>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-[#444444] font-medium">{label}</span>
+                  <span className="text-[#666666]">
+                    {completed}
+                    <span className="text-[#999999]">/{target}</span>
+                  </span>
+                </div>
+                <div className="h-1.5 bg-white/40 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#222222] rounded-full transition-all duration-500"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
-      )}
+      </div>
     </div>
   );
 }
